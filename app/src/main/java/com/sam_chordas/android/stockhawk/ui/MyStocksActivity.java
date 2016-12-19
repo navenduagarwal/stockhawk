@@ -63,6 +63,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     private RecyclerView recyclerView;
     private TextView emptyRecycleView;
     private BroadcastReceiver mDownloadReceiver;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +124,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         recyclerView.setAdapter(mCursorAdapter);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.attachToRecyclerView(recyclerView);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,7 +206,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         if (isConnected) {
             recyclerView.setVisibility(View.VISIBLE);
             emptyRecycleView.setVisibility(View.GONE);
+            fab.setVisibility(View.VISIBLE);
         } else {
+            fab.setVisibility(View.GONE);
             recyclerView.setVisibility(View.GONE);
             emptyRecycleView.setVisibility(View.VISIBLE);
         }
