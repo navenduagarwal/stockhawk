@@ -1,14 +1,17 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,6 +40,7 @@ import com.sam_chordas.android.stockhawk.service.StockIntentService;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
+
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
@@ -44,6 +48,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
      */
 
     private static final int CURSOR_LOADER_ID = 0;
+    public static String ACTION_STOCK_FOUND = "stock_found";
+    public static String ACTION_STOCK_NOT_FOUND = "stock_not_found";
     boolean isConnected;
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -56,6 +62,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     private Cursor mCursor;
     private RecyclerView recyclerView;
     private TextView emptyRecycleView;
+    private BroadcastReceiver mDownloadReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +89,22 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 networkToast();
             }
         }
+
+        mDownloadReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (MyStocksActivity.ACTION_STOCK_NOT_FOUND.equals(intent.getAction())) {
+                    String stockName = intent.getStringExtra("name");
+                    String message = getString(R.string.toast_stock_not_found, stockName);
+                    Toast.makeText(MyStocksActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+                if (MyStocksActivity.ACTION_STOCK_FOUND.equals(intent.getAction())) {
+                    String stockName = intent.getStringExtra("name");
+                    String message = getString(R.string.toast_stock_added, stockName);
+                    Toast.makeText(MyStocksActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+            }
+        };
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         emptyRecycleView = (TextView) findViewById(R.id.empty_recycle_view);
@@ -119,7 +142,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                                             new String[]{input.toString()}, null);
                                     if (c.getCount() != 0) {
                                         Toast toast =
-                                                Toast.makeText(MyStocksActivity.this, "This stock is already saved!",
+                                                Toast.makeText(MyStocksActivity.this, getString(R.string.toast_stock_exist),
                                                         Toast.LENGTH_LONG);
                                         toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                                         toast.show();
@@ -164,6 +187,14 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             // are updated.
             GcmNetworkManager.getInstance(this).schedule(periodicTask);
         }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_STOCK_FOUND);
+        filter.addAction(ACTION_STOCK_NOT_FOUND);
+
+        // Register download receiver
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mDownloadReceiver, filter);
     }
 
 
@@ -178,6 +209,12 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             recyclerView.setVisibility(View.GONE);
             emptyRecycleView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
     }
 
     public void networkToast() {
