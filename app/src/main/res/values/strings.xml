@@ -13,4 +13,5 @@
     <string name="toast_stock_not_found"><xliff:g id="symbol">%1$s</xliff:g> symbol not found</string>
     <string name="toast_stock_exist">This stock is already saved!</string>
     <string name="network_toast">Uh-oh! This app requires an internet connection</string>
+    <string name="graph_headline">Price over time</string>
 </resources>

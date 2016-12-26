@@ -25,8 +25,9 @@ public class Utils {
     public static boolean showPercent = true;
     private static String LOG_TAG = Utils.class.getSimpleName();
 
-    public static ArrayList quoteJsonToContentVals(final Context context, String JSON) {
+    public static ArrayList quoteJsonToContentVals(final Context context, String JSON, boolean asJSONObjects) {
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
+        ArrayList<JSONObject> jsonObjects = new ArrayList<>();
         JSONObject jsonObject = null;
         JSONArray resultsArray = null;
         try {
@@ -46,7 +47,13 @@ public class Utils {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        batchOperations.add(buildBatchOperation(jsonObject));
+
+                        if (!asJSONObjects) {
+                            batchOperations.add(buildBatchOperation(jsonObject));
+                        } else {
+                            jsonObjects.add(jsonObject);
+                        }
+
                     } else {
                         try {
                             Intent intent = new Intent(MyStocksActivity.ACTION_STOCK_NOT_FOUND);
@@ -82,13 +89,14 @@ public class Utils {
         } catch (JSONException e) {
             Log.e(LOG_TAG, "String to JSON failed: " + e);
         }
-        return batchOperations;
+        return asJSONObjects ? jsonObjects : batchOperations;
     }
 
     public static String truncateBidPrice(String bidPrice) {
-        if (!(bidPrice == null || bidPrice.equals("null"))) {
-            bidPrice = String.format(Locale.US, "%.2f", Float.parseFloat(bidPrice));
+        if (bidPrice.equalsIgnoreCase(null)) {
+            bidPrice = String.valueOf(0);
         }
+        bidPrice = String.format(Locale.US, "%.2f", Float.parseFloat(bidPrice));
         return bidPrice;
     }
 
@@ -100,6 +108,9 @@ public class Utils {
             change = change.substring(0, change.length() - 1);
         }
         change = change.substring(1, change.length());
+        if (change.equalsIgnoreCase(null)) {
+            change = String.valueOf(0);
+        }
         double round = (double) Math.round(Double.parseDouble(change) * 100) / 100;
         change = String.format(Locale.US, "%.2f", round);
         StringBuffer changeBuffer = new StringBuffer(change);
@@ -125,6 +136,14 @@ public class Utils {
             } else {
                 builder.withValue(QuoteColumns.ISUP, 1);
             }
+            builder.withValue(QuoteColumns.NAME, jsonObject.getString("Name"));
+            builder.withValue(QuoteColumns.DAYSHIGH, jsonObject.getString("DaysHigh"));
+            builder.withValue(QuoteColumns.DAYSLOW, jsonObject.getString("DaysLow"));
+            builder.withValue(QuoteColumns.YEARHIGH, jsonObject.getString("YearHigh"));
+            builder.withValue(QuoteColumns.YEARLOW, jsonObject.getString("YearLow"));
+            builder.withValue(QuoteColumns.LASTTRADE, jsonObject.getString("LastTradePriceOnly"));
+            builder.withValue(QuoteColumns.TODAYRANGE, jsonObject.getString("DaysRange"));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
