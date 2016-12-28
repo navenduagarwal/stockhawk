@@ -10,6 +10,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.db.chart.Tools;
@@ -33,7 +35,8 @@ public class LineGraphActivity extends AppCompatActivity implements LoaderManage
     private String mSymbol;
     private int mMaxValue = 0;
     private int mMinValue;
-    private TextView mDetailTextView;
+    private TextView mLastTradePriceText, mTodaysMinText, mTodaysMaxText, mAnnualMinText, mAnnualMaxText;
+    private ProgressBar mProgressBar;
 
     public static Intent newIntent(Context context, String symbol) {
         Intent intent = new Intent(context, LineGraphActivity.class);
@@ -46,14 +49,17 @@ public class LineGraphActivity extends AppCompatActivity implements LoaderManage
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_line_graph);
         mChart = (LineChartView) findViewById(R.id.linechart);
-        mDetailTextView = (TextView) findViewById(R.id.chart_detail);
-
+        mLastTradePriceText = (TextView) findViewById(R.id.detail_current_textview);
+        mTodaysMinText = (TextView) findViewById(R.id.detail_minimum_textview);
+        mTodaysMaxText = (TextView) findViewById(R.id.detail_maximum_textview);
+        mAnnualMinText = (TextView) findViewById(R.id.detail_annual_min_textview);
+        mAnnualMaxText = (TextView) findViewById(R.id.detail_annual_max_textview);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_detail);
         mSymbol = getIntent().getStringExtra(EXTRA_SYMBOL);
-
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(mSymbol);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
+        mProgressBar.setVisibility(View.VISIBLE);
         getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
 
@@ -62,7 +68,7 @@ public class LineGraphActivity extends AppCompatActivity implements LoaderManage
 
         return new CursorLoader(this,
                 QuoteProvider.Quotes.CONTENT_URI,
-                new String[]{QuoteColumns.BIDPRICE},
+                null,
                 QuoteColumns.SYMBOL + " = ?",
                 new String[]{mSymbol},
                 null);
@@ -75,12 +81,14 @@ public class LineGraphActivity extends AppCompatActivity implements LoaderManage
         if (dataSet != null && dataSet.size() != 0) {
             setChart(dataSet);
         }
+        mProgressBar.setVisibility(View.GONE);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
 
     private LineSet setLineSet(Cursor cursor) {
 
@@ -105,9 +113,22 @@ public class LineGraphActivity extends AppCompatActivity implements LoaderManage
                 mMinValue = Math.round(bidPrice);
             }
 
-            dataSet.addPoint(bidPrice + "", bidPrice);
+            dataSet.addPoint("", bidPrice);
             cursor.moveToNext();
         }
+        cursor.moveToLast();
+        if (getSupportActionBar() != null) {
+
+            String title = cursor.getString(cursor.getColumnIndex(QuoteColumns.NAME)) + "-" + mSymbol.toUpperCase();
+            getSupportActionBar().setTitle(title);
+        }
+        mLastTradePriceText.setText(cursor.getString(cursor.getColumnIndex(QuoteColumns.LASTTRADE)));
+        mTodaysMaxText.setText(cursor.getString(cursor.getColumnIndex(QuoteColumns.DAYSHIGH)));
+        mTodaysMinText.setText(cursor.getString(cursor.getColumnIndex(QuoteColumns.DAYSLOW)));
+        mAnnualMaxText.setText(cursor.getString(cursor.getColumnIndex(QuoteColumns.YEARHIGH)));
+        mAnnualMinText.setText(cursor.getString(cursor.getColumnIndex(QuoteColumns.YEARLOW)));
+
+        cursor.close();
 
         dataSet.setColor(Color.parseColor("#53c1bd"))
                 .setFill(Color.parseColor("#3d6c73"))
@@ -138,6 +159,5 @@ public class LineGraphActivity extends AppCompatActivity implements LoaderManage
 
         mChart.addData(dataSet);
         mChart.show();
-        mDetailTextView.setText("Max Value: " + mMaxValue + "\n" + "Min Value: " + mMinValue);
     }
 }

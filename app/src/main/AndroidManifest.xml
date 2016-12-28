@@ -30,7 +30,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.LineGraphActivity" />
+        <activity
+            android:name=".ui.LineGraphActivity"
+            android:parentActivityName=".ui.MyStocksActivity" />
         <service android:name="com.sam_chordas.android.stockhawk.service.StockTaskService"
             android:exported="true"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">

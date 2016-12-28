@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
     <TextView
         android:id="@+id/chart_heading"
         android:layout_width="match_parent"
@@ -13,23 +22,29 @@
         android:padding="8dp"
         android:text="@string/graph_headline"
         android:textColor="@android:color/white"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <com.db.chart.view.LineChartView
         android:id="@+id/linechart"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="4dp"
-        android:layout_weight="1" />
+        android:layout_height="@dimen/stock_detail_chart_height"
+        android:layout_margin="@dimen/activity_vertical_margin" />
 
-    <TextView
-        android:id="@+id/chart_detail"
-        android:layout_width="match_parent"
+            <ProgressBar
+                android:id="@+id/progress_detail"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="8dp"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        tools:text="Details" />
-
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:padding="16dp" />
 </LinearLayout>
+
+        <include
+            layout="@layout/detail_extras_grid"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2" />
+    </LinearLayout>
+</ScrollView>

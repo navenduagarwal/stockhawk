@@ -14,4 +14,16 @@
     <string name="toast_stock_exist">This stock is already saved!</string>
     <string name="network_toast">Uh-oh! This app requires an internet connection</string>
     <string name="graph_headline">Price over time</string>
+    <string name="last_trade_date">Last Trade Date</string>
+    <string name="minimum_price">Date\'s Minimum</string>
+    <string name="maximum_price">Date\'s Maximum</string>
+    <string name="current_price">Last Trade Price</string>
+    <string name="click_on_the_graph_to_view_stock_s_value">Click on graph to view the value</string>
+    <string name="annual_minimum">Annual Minimum</string>
+    <string name="annual_max">Annual Maximum</string>
+    <string name="your_stocks">Your Stocks</string>
+    <string name="stock_widget">Stock Widget</string>
+    <string name="add_a_new_stock">Add a new Stock</string>
+    <string name="already_saved">This stock is already saved!</string>
+    <string name="eoor_fetching">Error fetching stock</string>
 </resources>
