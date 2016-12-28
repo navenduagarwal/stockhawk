@@ -141,7 +141,7 @@ public class LineGraphActivity extends AppCompatActivity implements LoaderManage
 
         Paint gridPaint = new Paint();
         gridPaint.setColor(Color.parseColor("#53c1bd"));
-        gridPaint.setStyle(Paint.Style.STROKE);
+        gridPaint.setStyle(Paint.Style.FILL);
         gridPaint.setAntiAlias(true);
         gridPaint.setStrokeWidth(Tools.fromDpToPx(2));
 
@@ -155,7 +155,7 @@ public class LineGraphActivity extends AppCompatActivity implements LoaderManage
                 .setXAxis(false)
                 .setYAxis(false)
                 .setBorderSpacing(Tools.fromDpToPx(5))
-                .setGrid(ChartView.GridType.HORIZONTAL, gridPaint);
+                .setGrid(ChartView.GridType.FULL, gridPaint);
 
         mChart.addData(dataSet);
         mChart.show();
