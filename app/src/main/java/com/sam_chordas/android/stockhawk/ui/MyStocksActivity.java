@@ -97,12 +97,16 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 if (MyStocksActivity.ACTION_STOCK_NOT_FOUND.equals(intent.getAction())) {
                     String stockName = intent.getStringExtra("name");
                     String message = getString(R.string.toast_stock_not_found, stockName);
-                    Toast.makeText(MyStocksActivity.this, message, Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(MyStocksActivity.this, message, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
+                    toast.show();
                 }
                 if (MyStocksActivity.ACTION_STOCK_FOUND.equals(intent.getAction())) {
                     String stockName = intent.getStringExtra("name");
                     String message = getString(R.string.toast_stock_added, stockName);
-                    Toast.makeText(MyStocksActivity.this, message, Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(MyStocksActivity.this, message, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
+                    toast.show();
                 }
             }
         };
